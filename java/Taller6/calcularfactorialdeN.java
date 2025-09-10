@@ -9,12 +9,14 @@ public class calcularfactorialdeN {
         System.out.println("Ingrese un numero para N");
         int numero = scanner.nextInt();
 
-        int multi = 0;
+        double factorial = 1;
 
-        for (int i = 0; i <= numero; i++) {
-            ()
+        for (int i = 1; i <= numero; i++) {
+            factorial = factorial * i;
         }
-        
 
+        System.out.println("El factorial de: " + numero + " es " + factorial);
+        
+        scanner.close();
     }
 }

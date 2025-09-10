@@ -6,7 +6,7 @@ public class SumarHastaN {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // 1. Pedir N
+        
         System.out.print("Ingrese un valor para N: ");
         int n = scanner.nextInt();
        
