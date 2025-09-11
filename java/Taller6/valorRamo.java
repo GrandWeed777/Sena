@@ -41,7 +41,6 @@ public class valorRamo {
                 }
                 break;
         }
-
         int total = precio * cantidad;
         System.out.println("El precio del ramo es: $" + total);
 

@@ -22,5 +22,6 @@ public class sumadelosprimerosN {
         } 
         System.out.println();
         System.out.println("La suma de los primeros numeros de N es: " + suma);
+        sc.close();
     }
 }

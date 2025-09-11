@@ -21,6 +21,7 @@ public class sumadeimpareshastaN {
         }
          System.out.println();
         System.out.println("La suma de los impares hasta N es: " + suma);
-
+        sc.close();
     }
+    
 }

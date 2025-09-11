@@ -22,5 +22,6 @@ public class sumadepareshastaN {
         }
         System.out.println();
          System.out.println("La suma de los primeros pares de N es: " + suma);
+         sc.close();
     }
 }
