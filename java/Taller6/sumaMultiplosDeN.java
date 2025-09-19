@@ -20,7 +20,7 @@ public class sumaMultiplosDeN {
            suma = suma + resultado;
         }
         System.out.println("La suma de los multiplos es: " + suma);
-        
+        scanner.close();
     }
     
 }
