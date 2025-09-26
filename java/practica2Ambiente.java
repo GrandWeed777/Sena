@@ -1,30 +1,31 @@
+//+2 +4 -6 -8 +10 +12 -14 -16 +18 +20 -22 -24
 import java.util.Scanner;
 
 import Taller2.numerodentrorango;
 
 public class practica2Ambiente {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        int suma = 0;
+        int n = 12;
+        StringBuilder serie = new StringBuilder();
 
-        int n = sc.nextInt();
 
-        String numeroTexto = "";
-        int contador = 0;
-        int resultadoSuma = 0;
+        for (int i = 1; i <= n; i++){
+            int signo = ((i - 1)% 4 == 0 || (i - 1)% 4 == 1) ? 1 : -1;
+            int termino = i * 2;
+            int valor = signo * termino;
+            suma += valor;
 
-        for ( int i = 2; i <= n; i+=2){
-            if (contador < 2) {
-                numeroTexto = numeroTexto + " - " + i;
-                resultadoSuma -= i;
-                contador++;
+
+            if ( i == 1){
+                serie.append(valor);
             } else {
-                numeroTexto = numeroTexto + " + " + i;
-                resultadoSuma += i;
-                contador++;
-
-                if (contador == )
+                if (valor > 0)serie.append(" + ").append(valor);
+                else serie.append(" ").append(valor);
             }
         }
+        System.out.println("Serie =" + serie.toString());
+        System.out.println("Suma =" + suma);
     }
     
 }
