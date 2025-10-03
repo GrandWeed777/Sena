@@ -13,10 +13,10 @@ public class practicaAmbiente {
             System.out.println("1 - Agregar Tareas");
             System.out.println("2 - Ver Tareas");
             System.out.println("3 - Salir");
-            System.out.print("Selecciona una opción: ");
+            System.out.print("Selecciona una opcion: ");
 
             int opcion = sc.nextInt();
-            sc.nextLine(); 
+            sc.nextLine();
 
             if (opcion == 1) {
                 boolean agregarMasTareas = true;
@@ -26,14 +26,16 @@ public class practicaAmbiente {
                     String tarea = sc.nextLine();
                     tareas.add(tarea);
                     System.out.println("Tarea agregada.");
+                    System.out.println("");
 
                     System.out.println("Que quieres hacer?");
-                    System.out.println("1 - Agregar otra tarea");
                     System.out.println("0 - Volver al menú principal");
-                   
+                    System.out.println("1 - Agregar otra tarea");
+                    System.out.println("2 - Ver tus tareas");
+                    System.out.println("");
 
                     int opcionAgregar = sc.nextInt();
-                    sc.nextLine(); 
+                    sc.nextLine();
 
                     if (opcionAgregar == 1) {
                         agregarMasTareas = true;
@@ -41,8 +43,20 @@ public class practicaAmbiente {
                     } else if (opcionAgregar == 0) {
                         agregarMasTareas = false;
 
-                    } else {
-                        System.out.println("Opción no válida. Volviendo al menú.");
+                    } else if (opcionAgregar == 2) {
+                        if (tareas.isEmpty()) {
+                            System.out.println("No has agregado tareas.");
+                        } else {
+                            System.out.println("Tus tareas son:");
+                            for (int i = 0; i < tareas.size(); i++) {
+                                System.out.println((i + 1) + ". " + tareas.get(i));
+                            }
+                        }
+
+                    }
+
+                    else {
+                        System.out.println("Opción no válida. Volviendo al menu.");
                         agregarMasTareas = false;
                     }
                 }
