@@ -1,4 +1,5 @@
-package German.Taller1;
+package Taller1;
+
 
 import java.util.Scanner;
 
