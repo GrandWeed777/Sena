@@ -1,5 +1,4 @@
 
-
 import java.util.Scanner;
 
 public class bank {
@@ -7,10 +6,10 @@ public class bank {
         Scanner sc = new Scanner(System.in);
         int[] saldo = { 5000000 };
         int opcion = 0;
-        int limiteDia = 9999999;
-        int totalRetiros = 0;
-        int totalDepositos = 0;
-        int operaciones = 0;
+        float limiteDia = 9999999;
+        float totalRetiros = 0;
+        float totalDepositos = 0;
+        float operaciones = 0;
 
         while (opcion != 5) {
             System.out.println("\n--- Menú Principal ---");
@@ -23,17 +22,18 @@ public class bank {
             opcion = sc.nextInt();
 
             if (opcion == 1) {
-                System.out.println("Saldo actual: " + saldo[0]);
-                operaciones++; 
+                System.out.print("Saldo actual: $ " + saldo[0]);
+
+                operaciones++;
 
             } else if (opcion == 2) {
                 System.out.print("Digite el monto a depositar: ");
                 float deposito = sc.nextFloat();
                 saldo[0] += deposito;
                 totalDepositos += deposito;
-                operaciones ++;
+                operaciones++;
                 System.out.println("Depósito exitoso ");
-                System.out.println("Saldo actual: " + saldo[0]);
+                System.out.println("Saldo actual: $ " + saldo[0]);
 
             } else if (opcion == 3) {
                 System.out.print("Digite el monto a retirar: ");
@@ -42,12 +42,12 @@ public class bank {
                 if (totalRetiros + retiro < limiteDia && retiro <= saldo[0]) {
                     saldo[0] -= retiro;
                     totalRetiros += retiro;
-                    operaciones ++;
+                    operaciones++;
                     System.out.println("Retiro Exitoso");
                 } else {
                     System.out.println("Saldo insucifiente o limite de retiros alcanzado");
                 }
-                System.out.println("Saldo actual: " + saldo[0]);
+                System.out.println("Saldo actual: $ " + saldo[0]);
 
             } else if (opcion == 4) {
                 System.out.println("Total de depositos realizados: " + totalDepositos);
