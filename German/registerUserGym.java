@@ -33,6 +33,7 @@ public class registerUserGym {
             System.out.print("Ingrese tu contraseña nuevamente: ");
         }
         System.out.println("Hola! " + nombre + " Tu registro fue exitoso\nBienvenido!!");
+        sc.close();
     }
 
 }
