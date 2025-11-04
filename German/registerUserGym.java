@@ -36,4 +36,5 @@ public class registerUserGym {
         sc.close();
     }
 
+<<<<<<< HEAD
 }

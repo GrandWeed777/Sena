@@ -18,7 +18,7 @@ public class ejercisioparacompletar {
             char letra = mensaje.charAt(i);
             System.out.println(letra);
 
-             if (letra == 's') {
+            if (letra == 's') {
                 contadorS++;
             } else if (letra == 'e') {
                 contadorE++;
@@ -37,4 +37,5 @@ public class ejercisioparacompletar {
         }
         
     }
+    
 }
