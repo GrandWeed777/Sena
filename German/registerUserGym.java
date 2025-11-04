@@ -35,6 +35,4 @@ public class registerUserGym {
         System.out.println("Hola! " + nombre + " Tu registro fue exitoso\nBienvenido!!");
         sc.close();
     }
-
-<<<<<<< HEAD
 }

@@ -1,0 +1,14 @@
+div{
+    width: 100px;
+    height: 100px;
+    background-color: red;
+}
+
+#divverder {
+    background-color: green;
+}
+
+.divazul {
+    background-color: blue;
+    border-radius: 50%;
+}
