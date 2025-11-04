@@ -15,5 +15,6 @@ public class ejercisio2 {
             invertida += palabra.charAt(i);
         }
         System.out.println("Palabra invertida: " + invertida);
+        sc.close();
     }
 }

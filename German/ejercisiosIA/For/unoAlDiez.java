@@ -7,3 +7,5 @@ public class unoAlDiez {
         }
     }
 }
+/**Realiza un programa en Java que muestre en pantalla los números del 1 al 10 en orden ascendente.
+El programa debe utilizar una variable contador que se incremente en cada iteración hasta llegar al número 10. */

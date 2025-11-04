@@ -19,3 +19,5 @@ public class tablaSegunN {
         sc.close();
     }
 }
+/**Realiza un programa en Java que solicite al usuario ingresar un número entero y muestre en pantalla su tabla de multiplicar del 1 al 10.
+El programa debe calcular y mostrar cada resultado en el formato “número x contador = resultado”. */

@@ -1,3 +1,4 @@
+package practicaExamen;
 import java.util.Scanner;
 
 public class ejercisio5 {

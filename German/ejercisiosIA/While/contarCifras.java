@@ -14,3 +14,6 @@ public class contarCifras {
         System.out.println(contador);
     }
 }
+
+/**Realiza un programa en Java que permita contar cuántas cifras tiene un número entero positivo.
+ *  El programa debe solicitar o contener un número y determinar cuántos dígitos lo componen, mostrando el resultado en pantalla. */

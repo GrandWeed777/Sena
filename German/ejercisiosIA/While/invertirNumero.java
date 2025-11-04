@@ -14,3 +14,5 @@ public class invertirNumero {
         }
     }
 }
+/**Realiza un programa en Java que solicite al usuario ingresar un número entero positivo y muestre ese número invertido en pantalla.
+El programa debe extraer los dígitos del número uno por uno y construir su forma inversa, mostrando los dígitos en orden contrario al original. */

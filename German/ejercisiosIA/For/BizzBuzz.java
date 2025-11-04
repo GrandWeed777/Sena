@@ -16,3 +16,12 @@ public class BizzBuzz {
         }
     }
 }
+/**El problema FizzBuzz consiste en recorrer los números del 1 al 100 (o cualquier rango) y:
+
+Imprimir “Fizz” si el número es múltiplo de 3.
+
+Imprimir “Buzz” si el número es múltiplo de 5.
+
+Imprimir “FizzBuzz” si el número es múltiplo de ambos (3 y 5).
+
+De lo contrario, imprimir el número. */

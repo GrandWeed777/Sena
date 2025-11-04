@@ -26,3 +26,6 @@ public class numeroPrimo {
         sc.close();
     }
 }
+/**Realiza un programa en Java que solicite al usuario ingresar un número entero positivo y determine si dicho número es primo o no.
+Un número es primo cuando solo tiene dos divisores: 1 y él mismo.
+El programa debe contar cuántos divisores tiene el número y mostrar un mensaje indicando si es primo o no. */

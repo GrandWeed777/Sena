@@ -22,6 +22,7 @@ public class ejercisio3 {
                 }
         }
         System.out.println("La palabra '" + palabra + "' contiene " + contador + " veces la letra '" + letra + "'.");
+        sc.close();
 
     }
 }

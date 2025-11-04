@@ -33,7 +33,8 @@ public class ejercisioparacompletar {
             System.out.println("Se pude formar la palabra sena!");
         } else {
             System.out.println("No se puede formar la palabra sena");
+            
         }
-
+        
     }
 }

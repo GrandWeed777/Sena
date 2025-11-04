@@ -24,5 +24,6 @@ public class ejercisio1 {
         }
 
         System.out.println("La cadena tiene: " + contador + " vocales");
+        sc.close();
     }
 }
