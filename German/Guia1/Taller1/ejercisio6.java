@@ -1,6 +1,5 @@
 package Guia1.Taller1;
 
-
 import java.util.Scanner;
 
 public class ejercisio6 {
@@ -25,14 +24,14 @@ public class ejercisio6 {
 
             if (opcion == 1) {
                 System.out.println("Saldo actual: " + saldo[0]);
-                operaciones++; 
+                operaciones++;
 
             } else if (opcion == 2) {
                 System.out.print("Digite el monto a depositar: ");
                 float deposito = sc.nextFloat();
                 saldo[0] += deposito;
                 totalDepositos += deposito;
-                operaciones ++;
+                operaciones++;
                 System.out.println("Depósito exitoso ");
                 System.out.println("Saldo actual: " + saldo[0]);
 
@@ -43,7 +42,7 @@ public class ejercisio6 {
                 if (totalRetiros + retiro < limiteDia && retiro <= saldo[0]) {
                     saldo[0] -= retiro;
                     totalRetiros += retiro;
-                    operaciones ++;
+                    operaciones++;
                     System.out.println("Retiro Exitoso");
                 } else {
                     System.out.println("Saldo insucifiente o limite de retiros alcanzado");

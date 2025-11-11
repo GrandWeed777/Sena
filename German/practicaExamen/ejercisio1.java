@@ -7,11 +7,10 @@ public class ejercisio1 {
         Scanner sc = new Scanner(System.in);
         System.out.print("Ingrese una frase: ");
         String cadena = sc.nextLine();
-
         cadena = cadena.toLowerCase();
 
         int contador = 0;
-        
+
         String vocales = "aeiou";
 
         for (int i = 0; i < cadena.length(); i++) {

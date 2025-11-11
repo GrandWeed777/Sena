@@ -12,7 +12,7 @@ public class ejercisio4 {
             int numero = sc.nextInt();
             if (numero <= 0) {
                 numeropositivo = false;
-                System.out.println("Ingresa un numero correcto!");
+                System.out.println("Ingresa un numero incorrecto!");
             } else {
                 numeropositivo = true;
                 System.out.println("Numero correcto");

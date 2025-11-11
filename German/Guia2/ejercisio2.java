@@ -11,7 +11,7 @@ public class ejercisio2 {
 
         int contador = 1;
 
-        while ( contador <= 10) {
+        while (contador <= 10) {
             int resultado = numero * contador;
             System.out.println(numero + " x " + contador + " = " + resultado);
             contador++;
