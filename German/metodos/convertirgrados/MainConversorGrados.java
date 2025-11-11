@@ -10,13 +10,13 @@ public class MainConversorGrados {
         System.out.print("Ingrese los grados en celcius: ");
         double grados = sc.nextDouble();
 
-        double conversionf = miConversor.conversorFahren(grados);
+        double conversionf = miConversor.convertirAFahrenheit(grados);
 
-        double conversionk = miConversor.conversorkelvin(grados);
+        double conversionk = miConversor.convertirAKelvin(grados);
 
         miConversor.mostrarResultadof(conversionf);
         System.out.println();
         miConversor.mostrarResultadokk(conversionk);
-
+        sc.close();
     }
 }
