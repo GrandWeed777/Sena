@@ -11,6 +11,7 @@ public class ControlAcceesos {
         Scanner sc = new Scanner(System.in);
         System.out.print("Ingresa tu contraseña: ");
         String contraseña = sc.nextLine();
+        sc.close();
         return contraseña;
 
     }

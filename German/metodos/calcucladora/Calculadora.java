@@ -11,8 +11,8 @@ public class Calculadora {
         return resta;
     }
 
-    public void mostrarMensaje() {
-        System.out.println("Bienvenido a la calculadora");
+    public void mostrarMensaje(String mensaje) {
+        System.out.println(mensaje);
 
     }
 
