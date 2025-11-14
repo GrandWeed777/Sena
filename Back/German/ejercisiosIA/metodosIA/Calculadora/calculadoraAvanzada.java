@@ -2,8 +2,6 @@ package ejercisiosIA.metodosIA.Calculadora;
 
 import java.util.Scanner;
 
-import javax.sound.midi.Soundbank;
-
 public class calculadoraAvanzada {
 
     public void mostrarBienvenida() {
@@ -59,7 +57,7 @@ public class calculadoraAvanzada {
             double num1 = sc.nextDouble();
             System.out.print("Ingrese el segundo número: ");
             double num2 = sc.nextDouble();
-            sc.close();
+
             double resultado = 0;
 
             if (opcion == 1) {
@@ -76,7 +74,7 @@ public class calculadoraAvanzada {
             System.out.println("Resultado:" + resultado);
 
         }
-        
+
     }
 
 }
