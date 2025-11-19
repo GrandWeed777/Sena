@@ -1,3 +1,4 @@
+package ejercisiosIA.nuevosIA;
 import java.util.Scanner;
 
 public class ejercisioG {
