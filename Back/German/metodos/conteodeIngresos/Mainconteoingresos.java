@@ -1,4 +1,4 @@
-package conteodeIngresos;
+package metodos.conteodeIngresos;
 
 public class Mainconteoingresos {
     public static void main(String[] args) {
@@ -16,6 +16,5 @@ public class Mainconteoingresos {
 
         int promedio = micontrolador.calcularPromedio(micontrolador.suma);
         System.out.println("El promedio es de: " + promedio);
-
     }
 }

@@ -1,4 +1,4 @@
-package guardargastosUsuario;
+package metodos.guardargastosUsuario;
 
 import java.util.Scanner;
 
@@ -17,7 +17,7 @@ public class gastosUsuario {
             System.out.print("Ingrese los ingresos del dia " + contadordias + ": ");
             int ingreso = sc.nextInt();
             ingresos[i] = ingreso;
-            suma+= ingreso;
+            suma += ingreso;
             contadordias++;
         }
         return ingresos;
@@ -45,14 +45,12 @@ public class gastosUsuario {
         return menor;
     }
 
-    public int suma(int suma){
+    public int suma() {
         return suma;
     }
 
-    public int promedio(int suma){
-        int promedio = suma / 5;
-        return promedio;
+    public int promedio() {
+        return suma / 5;
     }
-
 
 }

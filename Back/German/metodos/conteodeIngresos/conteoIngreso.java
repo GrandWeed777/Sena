@@ -1,4 +1,4 @@
-package conteodeIngresos;
+package metodos.conteodeIngresos;
 
 import java.util.Scanner;
 
