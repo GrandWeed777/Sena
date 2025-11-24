@@ -1,12 +1,13 @@
 package ArreglosIA;
 
-public class iterararregloFor {
-
+public class recorrerArregloWhil {
     public static void main(String[] args) {
         int[] edades = {15, 18, 20, 22, 17, 30, 25};
 
-        for(int i = 0; i < edades.length; i++){
+        int i = 0;
+        while (edades.length >= 7) {
             System.out.println(edades[i]);
+            i++;
         }
     }
 }

@@ -21,6 +21,8 @@ public class MainCarro {
         Carro1.mostrarInfo();
         Carro2.mostrarInfo();
 
+       
+
         System.out.println("El carro 1 es modelo nuevo? " + Carro1.esModeloNevo());
         System.out.println("El carro 2 es modelo nuevo? " + Carro2.esModeloNevo());
 
