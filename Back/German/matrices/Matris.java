@@ -1,3 +1,4 @@
+package matrices;
 public class Matris {
     public static void main(String[] args) {
 

@@ -1,3 +1,4 @@
+package matrices;
 public class SumatoriaMatriz {
     public static void main(String[] args) {
         int[][] numeros = {

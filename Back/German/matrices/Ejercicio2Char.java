@@ -1,3 +1,4 @@
+package matrices;
 public class Ejercicio2Char {
     public static void main(String[] args) {
         char[][] tablero = new char[3][3];
