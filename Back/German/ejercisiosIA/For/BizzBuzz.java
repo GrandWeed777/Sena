@@ -24,4 +24,4 @@ Imprimir “Buzz” si el número es múltiplo de 5.
 
 Imprimir “FizzBuzz” si el número es múltiplo de ambos (3 y 5).
 
-De lo contrario, imprimir el número. */
+De lo contrario, imprimir el número.   5858F5 azul   767684 gris*/
