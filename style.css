@@ -1,54 +1,101 @@
-body, html {
+
+* {
     margin: 0;
     padding: 0;
-    height: 100%;
+    box-sizing: border-box;
     font-family: Arial, sans-serif;
-    background: #f2f2f2;
+}
+
+
+.header {
+    background: #111;
+    color: #fff;
+    padding: 25px;
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
 }
 
 .container {
-    height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: 30px;
+    padding: 40px;
+}
+
+
+.sidebar {
+    width: 260px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.sidebar h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin: 18px 0;
+    font-size: 22px;
+    color: #333;
+}
+
+.content {
+    flex: 1;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.content h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+
+.cards {
+    display: flex;
+    gap: 25px;
 }
 
 .card {
-    width: 320px;
-    height: 480px;
     background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    width: 280px;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
 }
 
-.card-image {
-    height: 40%;
-}
-
-.card-image img {
+.card img {
     width: 100%;
-    height: 100%;
+    height: 150px;
+    border-radius: 10px;
     object-fit: cover;
 }
 
-.card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 12px;
-    text-align: center;
+.card h3 {
+    font-size: 24px;
+    margin: 15px 0 5px 0;
 }
 
-.btn {
-    margin-top: auto;
-    display: inline-block;
-    padding: 10px 20px;
+.card p {
+    font-size: 18px;
+    color: #333;
+}
+
+
+.footer {
     background: #111;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    font-size: 20px;
 }
