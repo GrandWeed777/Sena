@@ -43,8 +43,7 @@ public class Tienda {
         System.out.println("-------------------------------------------");
 
         // **********  LÓGICA PARA AGREGAR PRODUCTOS EN LÍNEA ÚNICA **********
-        System.out.println(
-                " Ingresa los nombres de los productos que deseas comprar, separados por coma :");
+        System.out.println(" Ingresa los nombres de los productos que deseas comprar, separados por coma :");
         String entradaProductos = sc.nextLine();
 
         // 1. Dividir la cadena de entrada usando la coma (",") como delimitador
