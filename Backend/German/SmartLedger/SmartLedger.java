@@ -1,13 +1,23 @@
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.net.URL;
+import java.net.HttpURLConnection;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 public class SmartLedger {
 
     static Transaccion historial[] = new Transaccion[100];
     static int contador = 0;
     static HashMap<Integer, String> categorias = new HashMap<>();
-    static HashMap<String, Usuario> usuarios = new HashMap<>(); 
-    static Usuario usuarioActual = null; 
+    static HashMap<String, Usuario> usuarios = new HashMap<>();
+    static Usuario usuarioActual = null;
 
     // =========================================================================
     // Bloque de Autenticación
@@ -23,13 +33,12 @@ public class SmartLedger {
             System.out.println("3 - Salir");
             System.out.print("Seleccione una opción: ");
 
-            
             if (sc.hasNextInt()) {
                 opcionLogin = sc.nextInt();
-                sc.nextLine(); 
+                sc.nextLine();
             } else {
                 System.out.println("Entrada inválida. Intente de nuevo.");
-                sc.nextLine(); 
+                sc.nextLine();
                 continue;
             }
 
@@ -40,7 +49,7 @@ public class SmartLedger {
                 case 2:
                     if (iniciarSesion(sc)) {
                         System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuarioActual.nombre + "!\n");
-                        return; 
+                        return;
                     } else {
                         System.out.println("Usuario o contraseña incorrectos.");
                     }
@@ -68,10 +77,19 @@ public class SmartLedger {
         System.out.print("Ingrese su nombre: ");
         String nombre = sc.nextLine();
 
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = sc.nextLine();
+        Console console = System.console();
+        String contraseña;
 
-        Usuario nuevoUsuario = new Usuario(nombre, nombreUsuario, contrasena);
+        if (console != null) {
+            char[] passArray = console.readPassword("Ingrese su contraseña: ");
+            contraseña = new String(passArray);
+        } else {
+            // Fallback si se ejecuta desde un IDE
+            System.out.print("Ingrese su contraseña: ");
+            contraseña = sc.nextLine();
+        }
+
+        Usuario nuevoUsuario = new Usuario(nombre, nombreUsuario, contraseña);
         usuarios.put(nombreUsuario, nuevoUsuario);
         System.out.println("Usuario registrado con éxito!");
     }
@@ -80,12 +98,20 @@ public class SmartLedger {
         System.out.println("\n--- INICIO DE SESIÓN ---");
         System.out.print("Ingrese nombre de usuario: ");
         String nombreUsuario = sc.nextLine();
-        System.out.print("Ingrese contraseña: ");
-        String contrasena = sc.nextLine();
+        Console console = System.console();
+        String contraseña;
+
+        if (console != null) {
+            char[] passArray = console.readPassword("Ingrese contraseña: ");
+            contraseña = new String(passArray);
+        } else {
+            System.out.print("Ingrese contraseña: ");
+            contraseña = sc.nextLine();
+        }
 
         Usuario u = usuarios.get(nombreUsuario);
 
-        if (u != null && u.contrasena.equals(contrasena)) {
+        if (u != null && u.contraseña.equals(contraseña)) {
             usuarioActual = u; // Asignar el usuario logueado
             return true;
         }
@@ -105,7 +131,7 @@ public class SmartLedger {
 
         int opcion = 0;
 
-        while (opcion != 4) { 
+        while (opcion != 4) {
             System.out.println("\n=== SMARTLEDGER - Menú Principal ===");
             System.out.println(usuarioActual.nombre + " Puedes: ");
             System.out.println("1 - Agregar transaccion");
@@ -117,7 +143,7 @@ public class SmartLedger {
             // Manejo de errores para la entrada del menú principal
             if (sc.hasNextInt()) {
                 opcion = sc.nextInt();
-                sc.nextLine(); 
+                sc.nextLine();
             } else {
                 System.out.println("Entrada inválida. Intente de nuevo.");
                 sc.nextLine();
@@ -126,7 +152,7 @@ public class SmartLedger {
 
             switch (opcion) {
                 case 1:
-                    agregarTransaccion(sc); 
+                    agregarTransaccion(sc);
                     break;
                 case 2:
                     verHistorial();
@@ -143,6 +169,107 @@ public class SmartLedger {
             }
         }
     }
+    static String generarResumenIA(String resumenTexto) {
+    String resp = ""; // <- ahora visible para el catch
+
+    try {
+        URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
+
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Authorization",
+                "Bearer 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");
+        con.setDoOutput(true);
+
+        // Prompt formato CONSOLA PRO
+        String prompt =
+        "Genera un análisis financiero SOLO en formato texto plano, sin markdown, sin simbolos raros.\n" +
+        "Formato EXACTO:\n" +
+        "==============================\n" +
+        "      ANALISIS FINANCIERO\n" +
+        "==============================\n" +
+        "Ingresos: X\n" +
+        "Gastos: X\n" +
+        "Saldo Neto: X\n" +
+        "--- DETALLES ---\n" +
+        "Margen: X\n" +
+        "Relacion G/I: X\n" +
+        "--- RECOMENDACIONES ---\n" +
+        "1. ...\n2. ...\n3. ...\n\n" +
+        "Datos:\n" + resumenTexto;
+
+        // JSON
+        String jsonInput = """
+        {
+          "model": "deepseek/deepseek-chat",
+          "messages": [
+            { "role": "system", "content": "Eres una IA experta financiera." },
+            { "role": "user", "content": "%s" }
+          ]
+        }
+        """.formatted(prompt);
+
+        // Enviar JSON
+        try (OutputStream os = con.getOutputStream()) {
+            os.write(jsonInput.getBytes("utf-8"));
+        }
+
+        // Leer respuesta
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"));
+
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            response.append(line);
+        }
+        br.close();
+
+        resp = response.toString(); // guardar para debug
+
+        // ===============================
+        // EXTRACTOR SEGURO (FUNCIONA SIEMPRE)
+        // ===============================
+
+        String finalText = "";
+
+        // Formato tipo A (OpenAI-like)
+        int idx1 = resp.indexOf("\"content\":\"");
+        if (idx1 != -1) {
+            idx1 += 11;
+            int end = resp.indexOf("\"", idx1);
+            finalText = resp.substring(idx1, end);
+        }
+
+        // Formato tipo B (OpenRouter moderno)
+        int idx2 = resp.indexOf("\"text\":\"");
+        if (idx2 != -1) {
+            idx2 += 8;
+            int end = resp.indexOf("\"", idx2);
+            finalText = resp.substring(idx2, end);
+        }
+
+        // Si sigue vacío → no encontramos nada
+        if (finalText.isEmpty()) {
+            System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n"); 
+            return "Error: no se encontró texto en la respuesta.";
+        }
+
+        // Limpiar caracteres escapados
+        finalText = finalText.replace("\\n", "\n")
+                             .replace("\\t", " ")
+                             .replace("\\\"", "\"");
+
+        return finalText;
+
+    } catch (Exception e) {
+        System.out.println("\nRESPUESTA CRUDA (ERROR):\n" + resp + "\n");
+        return "Error al conectar con IA: " + e.getMessage();
+    }
+}
+
 
     // Se modificó para recibir el Scanner
     static void agregarTransaccion(Scanner sc) {
@@ -166,7 +293,7 @@ public class SmartLedger {
         String tipo = "";
         while (true) {
             System.out.print("Tipo (Ingreso/Gasto): ");
-            tipo = sc.nextLine().trim().toLowerCase(); 
+            tipo = sc.nextLine().trim().toLowerCase();
 
             if (tipo.equals("ingreso") || tipo.equals("gasto")) {
                 break;
@@ -198,7 +325,7 @@ public class SmartLedger {
         System.out.print("Descripcion: ");
         String descripcion = sc.nextLine();
 
-        Transaccion nueva = new Transaccion(monto, tipo, categoria, fecha, descripcion, usuarioActual.nombreUsuario); 
+        Transaccion nueva = new Transaccion(monto, tipo, categoria, fecha, descripcion, usuarioActual.nombreUsuario);
         historial[contador] = nueva;
         contador++;
 
@@ -212,7 +339,7 @@ public class SmartLedger {
         boolean hayTransacciones = false;
         for (int i = 0; i < contador; i++) {
             Transaccion t = historial[i];
-            
+
             if (t.nombreUsuario.equals(usuarioActual.nombreUsuario)) {
                 System.out.println("--------------------------------------");
                 System.out.println("=== TRANSACCIÓN " + (i + 1) + " ===");
@@ -251,12 +378,23 @@ public class SmartLedger {
         System.out.println("Total de Gastos: " + gastos);
         System.out.println("Saldo Neto: " + (ingresos - gastos));
 
-        if (ingresos > gastos) {
-            System.out.println("¡Vas por buen camino!");
-        } else if (gastos > ingresos) {
-            System.out.println("¡Cuidado con los gastos!");
-        } else {
-            System.out.println("Ingresos y gastos balanceados.");
-        }
+        String datos = "Ingresos: " + ingresos + ", Gastos: " + gastos + ", Saldo: " + (ingresos - gastos);
+
+        System.out.println("\n--- ANÁLISIS IA ---");
+
+        String analisisIA = generarResumenIA(datos);
+
+        analisisIA = analisisIA
+                .replace("\\n", "\n")
+                .replace("\\\\n", "\n")
+                .replace("###", "")
+                .replace("####", "")
+                .replace("**", "")
+                .replace("\\[", "")
+                .replace("\\]", "")
+                .replace("\\", "");
+
+        System.out.println(analisisIA);
+
     }
 }
