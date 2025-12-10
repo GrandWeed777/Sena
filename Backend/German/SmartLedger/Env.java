@@ -1,15 +1,15 @@
-
-    import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.HashMap;
+import java.io.*;
 
 public class Env {
 
-    private static HashMap<String, String> variables = new HashMap<>();
+    private static java.util.HashMap<String, String> variables = new java.util.HashMap<>();
 
     static {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(".env"));
+            File f = new File(".env");
+            System.out.println("Intentando cargar: " + f.getAbsolutePath());
+
+            BufferedReader br = new BufferedReader(new FileReader(f));
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -21,7 +21,7 @@ public class Env {
 
             br.close();
         } catch (Exception e) {
-            System.out.println("WARNING: No se pudo cargar .env");
+            System.out.println("WARNING: No se pudo cargar .env: " + e.getMessage());
         }
     }
 
@@ -29,4 +29,3 @@ public class Env {
         return variables.getOrDefault(key, "");
     }
 }
-
