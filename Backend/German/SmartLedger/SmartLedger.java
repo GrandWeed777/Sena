@@ -6,10 +6,6 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.net.URL;
-import java.net.HttpURLConnection;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 public class SmartLedger {
 
@@ -169,97 +165,95 @@ public class SmartLedger {
             }
         }
     }
+
     static String generarResumenIA(String resumenTexto) {
-    String resp = "";
+        String resp = "";
 
-    try {
-        URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
+        try {
+            URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
 
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setRequestProperty("Authorization",
-                "Bearer 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");
-        con.setDoOutput(true);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            String apiKey = Env.get("OPENROUTER_API_KEY");
 
-        String prompt =
-        "Genera un análisis financiero SOLO en formato texto plano, sin markdown, sin simbolos raros.\n" +
-        "Formato EXACTO:\n" +
-        "==============================\n" +
-        "      ANALISIS FINANCIERO\n" +
-        "==============================\n" +
-        "Ingresos: X\n" +
-        "Gastos: X\n" +
-        "Saldo Neto: X\n" +
-        "--- DETALLES ---\n" +
-        "Margen: X\n" +
-        "Relacion G/I: X\n" +
-        "--- RECOMENDACIONES ---\n" +
-        "1. ...\n2. ...\n3. ...\n\n" +
-        "Datos:\n" + resumenTexto;
+            con.setRequestProperty("Authorization", "Bearer " + apiKey);
+            con.setDoOutput(true);
 
-        String jsonInput =
-    "{\n" +
-    "  \"model\": \"deepseek/deepseek-chat\",\n" +
-    "  \"messages\": [\n" +
-    "    { \"role\": \"system\", \"content\": \"Eres una IA experta financiera.\" },\n" +
-    "    { \"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\" }\n" +
-    "  ]\n" +
-    "}";
+            String prompt = "Genera un análisis financiero SOLO en formato texto plano, sin markdown, sin simbolos raros.\n"
+                    +
+                    "Formato EXACTO:\n" +
+                    "==============================\n" +
+                    "      ANALISIS FINANCIERO\n" +
+                    "==============================\n" +
+                    "Ingresos: X\n" +
+                    "Gastos: X\n" +
+                    "Saldo Neto: X\n" +
+                    "--- DETALLES ---\n" +
+                    "Margen: X\n" +
+                    "Relacion G/I: X\n" +
+                    "--- RECOMENDACIONES ---\n" +
+                    "1. ...\n2. ...\n3. ...\n\n" +
+                    "Datos:\n" + resumenTexto;
 
+            String jsonInput = "{\n" +
+                    "  \"model\": \"deepseek/deepseek-chat\",\n" +
+                    "  \"messages\": [\n" +
+                    "    { \"role\": \"system\", \"content\": \"Eres una IA experta financiera.\" },\n" +
+                    "    { \"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\" }\n" +
+                    "  ]\n" +
+                    "}";
 
-
-        try (OutputStream os = con.getOutputStream()) {
-            os.write(jsonInput.getBytes("utf-8"));
-        }
-
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"));
-
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        while ((line = br.readLine()) != null) {
-            response.append(line);
-        }
-        br.close();
-
-        resp = response.toString();
-
-        // -------------------------------
-        // NUEVO EXTRACTOR CORRECTO
-        // -------------------------------
-
-        String finalText = "";
-
-        // 1. Buscar la parte correcta del JSON
-        int msgIndex = resp.indexOf("\"message\"");
-        if (msgIndex != -1) {
-            int contentIndex = resp.indexOf("\"content\":\"", msgIndex);
-            if (contentIndex != -1) {
-                contentIndex += 11;
-                int end = resp.indexOf("\"", contentIndex);
-                finalText = resp.substring(contentIndex, end);
+            try (OutputStream os = con.getOutputStream()) {
+                os.write(jsonInput.getBytes("utf-8"));
             }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), "utf-8"));
+
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+            br.close();
+
+            resp = response.toString();
+
+            // -------------------------------
+            // NUEVO EXTRACTOR CORRECTO
+            // -------------------------------
+
+            String finalText = "";
+
+            // 1. Buscar la parte correcta del JSON
+            int msgIndex = resp.indexOf("\"message\"");
+            if (msgIndex != -1) {
+                int contentIndex = resp.indexOf("\"content\":\"", msgIndex);
+                if (contentIndex != -1) {
+                    contentIndex += 11;
+                    int end = resp.indexOf("\"", contentIndex);
+                    finalText = resp.substring(contentIndex, end);
+                }
+            }
+
+            if (finalText.isEmpty()) {
+                System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n");
+                return "Error: no se encontró texto en la respuesta.";
+            }
+
+            finalText = finalText.replace("\\n", "\n")
+                    .replace("\\t", " ")
+                    .replace("\\\"", "\"");
+
+            return finalText;
+
+        } catch (Exception e) {
+            System.out.println("\nRESPUESTA CRUDA (ERROR):\n" + resp + "\n");
+            return "Error al conectar con IA: " + e.getMessage();
         }
-
-        if (finalText.isEmpty()) {
-            System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n");
-            return "Error: no se encontró texto en la respuesta.";
-        }
-
-        finalText = finalText.replace("\\n", "\n")
-                             .replace("\\t", " ")
-                             .replace("\\\"", "\"");
-
-        return finalText;
-
-    } catch (Exception e) {
-        System.out.println("\nRESPUESTA CRUDA (ERROR):\n" + resp + "\n");
-        return "Error al conectar con IA: " + e.getMessage();
     }
-}
-
 
     // Se modificó para recibir el Scanner
     static void agregarTransaccion(Scanner sc) {
