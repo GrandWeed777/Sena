@@ -170,7 +170,7 @@ public class SmartLedger {
         }
     }
     static String generarResumenIA(String resumenTexto) {
-    String resp = ""; // <- ahora visible para el catch
+    String resp = "";
 
     try {
         URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
@@ -179,10 +179,9 @@ public class SmartLedger {
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Authorization",
-                "Bearer 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");
+                "Bearer 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");
         con.setDoOutput(true);
 
-        // Prompt formato CONSOLA PRO
         String prompt =
         "Genera un análisis financiero SOLO en formato texto plano, sin markdown, sin simbolos raros.\n" +
         "Formato EXACTO:\n" +
@@ -199,23 +198,21 @@ public class SmartLedger {
         "1. ...\n2. ...\n3. ...\n\n" +
         "Datos:\n" + resumenTexto;
 
-        // JSON
-        String jsonInput = """
-        {
-          "model": "deepseek/deepseek-chat",
-          "messages": [
-            { "role": "system", "content": "Eres una IA experta financiera." },
-            { "role": "user", "content": "%s" }
-          ]
-        }
-        """.formatted(prompt);
+        String jsonInput =
+    "{\n" +
+    "  \"model\": \"deepseek/deepseek-chat\",\n" +
+    "  \"messages\": [\n" +
+    "    { \"role\": \"system\", \"content\": \"Eres una IA experta financiera.\" },\n" +
+    "    { \"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\" }\n" +
+    "  ]\n" +
+    "}";
 
-        // Enviar JSON
+
+
         try (OutputStream os = con.getOutputStream()) {
             os.write(jsonInput.getBytes("utf-8"));
         }
 
-        // Leer respuesta
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), "utf-8"));
 
@@ -227,37 +224,30 @@ public class SmartLedger {
         }
         br.close();
 
-        resp = response.toString(); // guardar para debug
+        resp = response.toString();
 
-        // ===============================
-        // EXTRACTOR SEGURO (FUNCIONA SIEMPRE)
-        // ===============================
+        // -------------------------------
+        // NUEVO EXTRACTOR CORRECTO
+        // -------------------------------
 
         String finalText = "";
 
-        // Formato tipo A (OpenAI-like)
-        int idx1 = resp.indexOf("\"content\":\"");
-        if (idx1 != -1) {
-            idx1 += 11;
-            int end = resp.indexOf("\"", idx1);
-            finalText = resp.substring(idx1, end);
+        // 1. Buscar la parte correcta del JSON
+        int msgIndex = resp.indexOf("\"message\"");
+        if (msgIndex != -1) {
+            int contentIndex = resp.indexOf("\"content\":\"", msgIndex);
+            if (contentIndex != -1) {
+                contentIndex += 11;
+                int end = resp.indexOf("\"", contentIndex);
+                finalText = resp.substring(contentIndex, end);
+            }
         }
 
-        // Formato tipo B (OpenRouter moderno)
-        int idx2 = resp.indexOf("\"text\":\"");
-        if (idx2 != -1) {
-            idx2 += 8;
-            int end = resp.indexOf("\"", idx2);
-            finalText = resp.substring(idx2, end);
-        }
-
-        // Si sigue vacío → no encontramos nada
         if (finalText.isEmpty()) {
-            System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n"); 
+            System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n");
             return "Error: no se encontró texto en la respuesta.";
         }
 
-        // Limpiar caracteres escapados
         finalText = finalText.replace("\\n", "\n")
                              .replace("\\t", " ")
                              .replace("\\\"", "\"");
