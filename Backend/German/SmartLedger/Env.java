@@ -1,3 +1,5 @@
+// Archivo: Env.java
+
 import java.io.*;
 
 public class Env {
@@ -13,9 +15,27 @@ public class Env {
             String line;
 
             while ((line = br.readLine()) != null) {
+                // Ignorar líneas vacías o comentarios (#)
+                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
+                    continue; 
+                }
+                
                 if (line.contains("=")) {
                     String[] parts = line.split("=", 2);
-                    variables.put(parts[0].trim(), parts[1].trim());
+                    
+                    String key = parts[0].trim();
+                    String value = parts[1].trim(); 
+                    
+                    // --- ARREGLO CRÍTICO: Limpiar comillas ---
+                    // Si el valor está entre comillas (ej: value="clave"), las quitamos.
+                    if (value.startsWith("\"") && value.endsWith("\"")) {
+                        value = value.substring(1, value.length() - 1);
+                    } else if (value.startsWith("'") && value.endsWith("'")) {
+                        value = value.substring(1, value.length() - 1);
+                    }
+                    // ----------------------------------------
+                    
+                    variables.put(key, value);
                 }
             }
 

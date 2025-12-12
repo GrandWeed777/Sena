@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.Console;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -171,49 +172,57 @@ public class SmartLedger {
 
         try {
             URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
-
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
-            String apiKey = Env.get("OPENROUTER_API_KEY");
 
+            // Cargar API Key
+            String apiKey = Env.get("OPENROUTER_API_KEY");
+            if (apiKey == null || apiKey.isEmpty()) {
+                return "Error: API Key no encontrada en .env";
+            }
             con.setRequestProperty("Authorization", "Bearer " + apiKey);
             con.setDoOutput(true);
 
-            String prompt = "Genera un análisis financiero SOLO en formato texto plano, sin markdown, sin simbolos raros.\n"
-                    +
-                    "Formato EXACTO:\n" +
-                    "==============================\n" +
-                    "      ANALISIS FINANCIERO\n" +
-                    "==============================\n" +
-                    "Ingresos: X\n" +
-                    "Gastos: X\n" +
-                    "Saldo Neto: X\n" +
-                    "--- DETALLES ---\n" +
-                    "Margen: X\n" +
-                    "Relacion G/I: X\n" +
-                    "--- RECOMENDACIONES ---\n" +
-                    "1. ...\n2. ...\n3. ...\n\n" +
+            // --- ARREGLO 1: Escapar caracteres especiales para JSON ---
+            // El texto del prompt no puede tener saltos de linea reales, deben ser \\n
+            String prompt = "Genera un análisis financiero SOLO en formato texto plano...\n" +
                     "Datos:\n" + resumenTexto;
+
+            String promptSeguro = prompt
+                    .replace("\\", "\\\\") // Escapar barras invertidas primero
+                    .replace("\"", "\\\"") // Escapar comillas dobles
+                    .replace("\n", "\\n") // Escapar saltos de línea
+                    .replace("\r", "");
 
             String jsonInput = "{\n" +
                     "  \"model\": \"deepseek/deepseek-chat\",\n" +
                     "  \"messages\": [\n" +
                     "    { \"role\": \"system\", \"content\": \"Eres una IA experta financiera.\" },\n" +
-                    "    { \"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\" }\n" +
+                    "    { \"role\": \"user\", \"content\": \"" + promptSeguro + "\" }\n" +
                     "  ]\n" +
                     "}";
 
             try (OutputStream os = con.getOutputStream()) {
-                os.write(jsonInput.getBytes("utf-8"));
+                byte[] input = jsonInput.getBytes("utf-8");
+                os.write(input, 0, input.length);
             }
 
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream(), "utf-8"));
+            // --- ARREGLO 2: Manejo de Errores HTTP ---
+            int status = con.getResponseCode();
+            InputStream stream;
 
+            // Si el estatus es mayor a 299 (ej: 400, 401, 500), leemos el error, no el
+            // input
+            if (status > 299) {
+                stream = con.getErrorStream();
+            } else {
+                stream = con.getInputStream();
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream, "utf-8"));
             StringBuilder response = new StringBuilder();
             String line;
-
             while ((line = br.readLine()) != null) {
                 response.append(line);
             }
@@ -221,37 +230,50 @@ public class SmartLedger {
 
             resp = response.toString();
 
-            // -------------------------------
-            // NUEVO EXTRACTOR CORRECTO
-            // -------------------------------
+            // Si hubo error HTTP, mostramos la respuesta cruda para depurar
+            if (status > 299) {
+                return "Error de API (" + status + "): " + resp;
+            }
 
+            // --- Extracción del texto (Misma lógica, un poco más robusta) ---
             String finalText = "";
+            String searchKey = "\"content\":\"";
+            int contentIndex = resp.indexOf(searchKey);
 
-            // 1. Buscar la parte correcta del JSON
-            int msgIndex = resp.indexOf("\"message\"");
-            if (msgIndex != -1) {
-                int contentIndex = resp.indexOf("\"content\":\"", msgIndex);
-                if (contentIndex != -1) {
-                    contentIndex += 11;
-                    int end = resp.indexOf("\"", contentIndex);
-                    finalText = resp.substring(contentIndex, end);
+            if (contentIndex != -1) {
+                contentIndex += searchKey.length();
+                // Buscamos la comilla de cierre, pero cuidado con las comillas escapadas dentro
+                // del texto
+                // Para un parseo manual simple, buscaremos la secuencia que cierra el JSON del
+                // mensaje
+                int end = resp.lastIndexOf("\""); // Simplificación
+
+                // Un enfoque manual más seguro para encontrar el cierre:
+                boolean isEscaped = false;
+                for (int i = contentIndex; i < resp.length(); i++) {
+                    char c = resp.charAt(i);
+                    if (c == '\\') {
+                        isEscaped = !isEscaped;
+                    } else if (c == '"' && !isEscaped) {
+                        finalText = resp.substring(contentIndex, i);
+                        break;
+                    } else {
+                        isEscaped = false;
+                    }
                 }
             }
 
             if (finalText.isEmpty()) {
-                System.out.println("\nRESPUESTA CRUDA:\n" + resp + "\n");
-                return "Error: no se encontró texto en la respuesta.";
+                // Fallback si el parseo falla pero la respuesta fue 200 OK
+                System.out.println("DEBUG JSON: " + resp);
+                return "Error al leer el contenido JSON.";
             }
 
-            finalText = finalText.replace("\\n", "\n")
-                    .replace("\\t", " ")
-                    .replace("\\\"", "\"");
-
-            return finalText;
+            return finalText.replace("\\n", "\n").replace("\\\"", "\"");
 
         } catch (Exception e) {
-            System.out.println("\nRESPUESTA CRUDA (ERROR):\n" + resp + "\n");
-            return "Error al conectar con IA: " + e.getMessage();
+            e.printStackTrace(); // Imprime el error exacto en consola
+            return "Error de conexión: " + e.getMessage();
         }
     }
 
