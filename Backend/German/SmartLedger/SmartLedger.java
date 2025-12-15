@@ -10,11 +10,11 @@ import java.net.URL;
 
 public class SmartLedger {
 
-    static Transaccion historial[] = new Transaccion[100];
-    static int contador = 0;
-    static HashMap<Integer, String> categorias = new HashMap<>();
-    static HashMap<String, Usuario> usuarios = new HashMap<>();
-    static Usuario usuarioActual = null;
+    private static Transaccion historial[] = new Transaccion[100];
+    private static int contador = 0;
+    private static HashMap<Integer, String> categorias = new HashMap<>();
+    private static HashMap<String, Usuario> usuarios = new HashMap<>();
+    private static Usuario usuarioActual = null;
 
     // =========================================================================
     // Bloque de Autenticación
@@ -45,7 +45,8 @@ public class SmartLedger {
                     break;
                 case 2:
                     if (iniciarSesion(sc)) {
-                        System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuarioActual.nombre + "!\n");
+                        System.out
+                                .println("Inicio de sesión exitoso. Bienvenido, " + usuarioActual.getNombre() + "!\n");
                         return;
                     } else {
                         System.out.println("Usuario o contraseña incorrectos.");
@@ -108,7 +109,7 @@ public class SmartLedger {
 
         Usuario u = usuarios.get(nombreUsuario);
 
-        if (u != null && u.contraseña.equals(contraseña)) {
+        if (u != null && u.verificarContraseña(contraseña)) {
             usuarioActual = u; // Asignar el usuario logueado
             return true;
         }
@@ -130,7 +131,7 @@ public class SmartLedger {
 
         while (opcion != 4) {
             System.out.println("\n=== SMARTLEDGER - Menú Principal ===");
-            System.out.println(usuarioActual.nombre + " Puedes: ");
+            System.out.println("    ---- " + usuarioActual.getNombre() + " Puedes: ----");
             System.out.println("1 - Agregar transaccion");
             System.out.println("2 - Ver historial");
             System.out.println("3 - Ver resumen del dia");
@@ -167,6 +168,93 @@ public class SmartLedger {
         }
     }
 
+    static void agregarTransaccion(Scanner sc) {
+
+        if (contador >= historial.length) {
+            System.out.println("No puede agregar transaciones (límite alcanzado)");
+            return;
+        }
+
+        System.out.println("\n--- NUEVA TRANSACCION ---");
+        System.out.print("Ingresa el monto: ");
+
+        double monto;
+        while (!sc.hasNextDouble()) {
+            System.out.println("Monto inválido. Intenta de nuevo: ");
+            sc.nextLine();
+        }
+        monto = sc.nextDouble();
+        sc.nextLine();
+
+        System.out.println("--------------------------");
+        String tipo = "";
+        while (true) {
+            System.out.print("Tipo (Ingreso/Gasto): ");
+            tipo = sc.nextLine().trim().toLowerCase();
+
+            if (tipo.equals("ingreso") || tipo.equals("gasto")) {
+                break;
+            } else {
+                System.out.println("Tipo inválido. Intenta nuevamente!");
+            }
+        }
+
+        System.out.println("\nCategorias disponibles:");
+        for (int key : categorias.keySet()) {
+            System.out.println(key + " - " + categorias.get(key));
+        }
+
+        System.out.print("Seleccione una categoria(numero): ");
+
+        int opcionCategoria;
+        while (!sc.hasNextInt()) {
+            System.out.println("Opción de categoría inválida. Intaenta de nuevo: ");
+            sc.nextLine();
+        }
+        opcionCategoria = sc.nextInt();
+        sc.nextLine();
+
+        String categoria = categorias.getOrDefault(opcionCategoria, "Otros");
+
+        System.out.print("Ingresa la fecha (DD/MM/AA): ");
+        String fecha = sc.nextLine();
+
+        System.out.print("Descripcion: ");
+        String descripcion = sc.nextLine();
+
+        Transaccion nueva = new Transaccion(monto, tipo, categoria, fecha, descripcion,
+                usuarioActual.getNombreUsuario());
+        historial[contador] = nueva;
+        contador++;
+
+        System.out.println("Transacion realizada con éxito");
+    }
+
+    static void verHistorial() {
+        System.out
+                .println("\n--- HISTORIAL DE TRANSACCIONES DE " + usuarioActual.getNombre().toUpperCase() + " ----");
+
+        boolean hayTransacciones = false;
+        for (int i = 0; i < contador; i++) {
+            Transaccion t = historial[i];
+
+            if (t.getNombreUsuario().equals(usuarioActual.getNombreUsuario())) {
+                System.out.println("--------------------------------------");
+                System.out.println("=== TRANSACCIÓN " + (i + 1) + " ===");
+                System.out.println("Monto: " + t.getMonto());
+                System.out.println("Tipo: " + t.getTipo());
+                System.out.println("Categoria: " + t.getCategoria());
+                System.out.println("Fecha: " + t.getFecha());
+                System.out.println("Descripcion: " + t.getDescripcion());
+                hayTransacciones = true;
+            }
+        }
+
+        if (!hayTransacciones) {
+            System.out.println("No hay transacciones registradas para este usuario.");
+        }
+    }
+
     static String generarResumenIA(String resumenTexto) {
         String resp = "";
 
@@ -186,8 +274,12 @@ public class SmartLedger {
 
             // --- ARREGLO 1: Escapar caracteres especiales para JSON ---
             // El texto del prompt no puede tener saltos de linea reales, deben ser \\n
-            String prompt = "Genera un análisis financiero SOLO en formato texto plano...\n" +
-                    "Datos:\n" + resumenTexto;
+            String prompt = "Actúa como un asesor financiero cercano y amigable. " +
+                    "Explica el estado financiero de forma sencilla, positiva y fácil de entender. " +
+                    "NO uses fórmulas matemáticas, porcentajes técnicos ni lenguaje contable. " +
+                    "Habla directamente al usuario, como si le dieras un consejo personal. " +
+                    "Usa párrafos cortos y un tono motivador.\n\n" +
+                    "Datos del día:\n" + resumenTexto;
 
             String promptSeguro = prompt
                     .replace("\\", "\\\\") // Escapar barras invertidas primero
@@ -277,105 +369,19 @@ public class SmartLedger {
         }
     }
 
-    // Se modificó para recibir el Scanner
-    static void agregarTransaccion(Scanner sc) {
-
-        if (contador >= historial.length) {
-            System.out.println("No puede agregar transaciones (límite alcanzado)");
-            return;
-        }
-
-        System.out.println("\n--- NUEVA TRANSACCION ---");
-        System.out.print("Ingresa el monto: ");
-
-        double monto;
-        while (!sc.hasNextDouble()) {
-            System.out.println("Monto inválido. Intenta de nuevo: ");
-            sc.nextLine();
-        }
-        monto = sc.nextDouble();
-        sc.nextLine();
-
-        String tipo = "";
-        while (true) {
-            System.out.print("Tipo (Ingreso/Gasto): ");
-            tipo = sc.nextLine().trim().toLowerCase();
-
-            if (tipo.equals("ingreso") || tipo.equals("gasto")) {
-                break;
-            } else {
-                System.out.println("Tipo inválido. Intenta nuevamente!");
-            }
-        }
-
-        System.out.println("\nCategorias disponibles:");
-        for (int key : categorias.keySet()) {
-            System.out.println(key + " - " + categorias.get(key));
-        }
-
-        System.out.print("Seleccione una categoria(numero): ");
-
-        int opcionCategoria;
-        while (!sc.hasNextInt()) {
-            System.out.println("Opción de categoría inválida. Intaenta de nuevo: ");
-            sc.nextLine();
-        }
-        opcionCategoria = sc.nextInt();
-        sc.nextLine();
-
-        String categoria = categorias.getOrDefault(opcionCategoria, "Otros");
-
-        System.out.print("Ingresa la fecha (DD/MM/AA): ");
-        String fecha = sc.nextLine();
-
-        System.out.print("Descripcion: ");
-        String descripcion = sc.nextLine();
-
-        Transaccion nueva = new Transaccion(monto, tipo, categoria, fecha, descripcion, usuarioActual.nombreUsuario);
-        historial[contador] = nueva;
-        contador++;
-
-        System.out.println("Transacion realizada con éxito");
-    }
-
-    static void verHistorial() {
-        System.out
-                .println("\n--- HISTORIAL DE TRANSACCIONES DE " + usuarioActual.nombre.toUpperCase() + " ----");
-
-        boolean hayTransacciones = false;
-        for (int i = 0; i < contador; i++) {
-            Transaccion t = historial[i];
-
-            if (t.nombreUsuario.equals(usuarioActual.nombreUsuario)) {
-                System.out.println("--------------------------------------");
-                System.out.println("=== TRANSACCIÓN " + (i + 1) + " ===");
-                System.out.println("Monto: " + t.monto);
-                System.out.println("Tipo: " + t.tipo);
-                System.out.println("Categoria: " + t.categoria);
-                System.out.println("Fecha: " + t.fecha);
-                System.out.println("Descripcion: " + t.descripción);
-                hayTransacciones = true;
-            }
-        }
-
-        if (!hayTransacciones) {
-            System.out.println("No hay transacciones registradas para este usuario.");
-        }
-    }
-
     static void verResumen() {
-        System.out.println("\n--- RESUMEN DEL DÍA DE " + usuarioActual.nombre.toUpperCase() + " ----");
+        System.out.println("\n--- RESUMEN DEL DÍA DE " + usuarioActual.getNombre().toUpperCase() + " ----");
 
         double ingresos = 0;
         double gastos = 0;
 
         for (int i = 0; i < contador; i++) {
             Transaccion t = historial[i];
-            if (t.nombreUsuario.equals(usuarioActual.nombreUsuario)) {
-                if (t.tipo.equalsIgnoreCase("ingreso")) {
-                    ingresos += t.monto;
-                } else if (t.tipo.equalsIgnoreCase("gasto")) {
-                    gastos += t.monto;
+            if (t.getNombreUsuario().equals(usuarioActual.getNombreUsuario())) {
+                if (t.getTipo().equalsIgnoreCase("ingreso")) {
+                    ingresos += t.getMonto();
+                } else if (t.getTipo().equalsIgnoreCase("gasto")) {
+                    gastos += t.getMonto();
                 }
             }
         }

@@ -1,11 +1,20 @@
-public class Usuario {
-    String nombre;           
-    String nombreUsuario;    
-    String contraseña;      
+public class Usuario extends Persona{
+             
+    private String nombreUsuario;    
+    private String contraseña;      
 
     public Usuario(String nombre, String nombreUsuario, String contraseña){
-        this.nombre = nombre;
+        super(nombre);
         this.nombreUsuario = nombreUsuario;
         this.contraseña = contraseña;
     }
+
+    public String getNombreUsuario(){
+        return nombreUsuario;
+    }
+
+    public boolean verificarContraseña(String contraseña){
+        return  contraseña.equals(contraseña);
+    }
+
 }
