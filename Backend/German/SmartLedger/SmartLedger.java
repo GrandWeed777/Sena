@@ -16,9 +16,6 @@ public class SmartLedger {
     private static HashMap<String, Usuario> usuarios = new HashMap<>();
     private static Usuario usuarioActual = null;
 
-    // =========================================================================
-    // Bloque de Autenticación
-    // =========================================================================
 
     static void menuAutenticacion(Scanner sc) {
         int opcionLogin = 0;
@@ -82,7 +79,7 @@ public class SmartLedger {
             char[] passArray = console.readPassword("Ingrese su contraseña: ");
             contraseña = new String(passArray);
         } else {
-            // Fallback si se ejecuta desde un IDE
+          
             System.out.print("Ingrese su contraseña: ");
             contraseña = sc.nextLine();
         }
@@ -272,8 +269,7 @@ public class SmartLedger {
             con.setRequestProperty("Authorization", "Bearer " + apiKey);
             con.setDoOutput(true);
 
-            // --- ARREGLO 1: Escapar caracteres especiales para JSON ---
-            // El texto del prompt no puede tener saltos de linea reales, deben ser \\n
+            
             String prompt = "Actúa como un asesor financiero cercano y amigable. " +
                     "Explica el estado financiero de forma sencilla, positiva y fácil de entender. " +
                     "NO uses fórmulas matemáticas, porcentajes técnicos ni lenguaje contable. " +
@@ -282,9 +278,9 @@ public class SmartLedger {
                     "Datos del día:\n" + resumenTexto;
 
             String promptSeguro = prompt
-                    .replace("\\", "\\\\") // Escapar barras invertidas primero
-                    .replace("\"", "\\\"") // Escapar comillas dobles
-                    .replace("\n", "\\n") // Escapar saltos de línea
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"") 
+                    .replace("\n", "\\n") 
                     .replace("\r", "");
 
             String jsonInput = "{\n" +
@@ -300,12 +296,12 @@ public class SmartLedger {
                 os.write(input, 0, input.length);
             }
 
-            // --- ARREGLO 2: Manejo de Errores HTTP ---
+            
             int status = con.getResponseCode();
             InputStream stream;
 
-            // Si el estatus es mayor a 299 (ej: 400, 401, 500), leemos el error, no el
-            // input
+           
+            
             if (status > 299) {
                 stream = con.getErrorStream();
             } else {
@@ -322,25 +318,20 @@ public class SmartLedger {
 
             resp = response.toString();
 
-            // Si hubo error HTTP, mostramos la respuesta cruda para depurar
             if (status > 299) {
                 return "Error de API (" + status + "): " + resp;
             }
 
-            // --- Extracción del texto (Misma lógica, un poco más robusta) ---
             String finalText = "";
             String searchKey = "\"content\":\"";
             int contentIndex = resp.indexOf(searchKey);
 
             if (contentIndex != -1) {
                 contentIndex += searchKey.length();
-                // Buscamos la comilla de cierre, pero cuidado con las comillas escapadas dentro
-                // del texto
-                // Para un parseo manual simple, buscaremos la secuencia que cierra el JSON del
-                // mensaje
-                int end = resp.lastIndexOf("\""); // Simplificación
+        
+                int end = resp.lastIndexOf("\""); 
 
-                // Un enfoque manual más seguro para encontrar el cierre:
+                
                 boolean isEscaped = false;
                 for (int i = contentIndex; i < resp.length(); i++) {
                     char c = resp.charAt(i);
@@ -356,7 +347,6 @@ public class SmartLedger {
             }
 
             if (finalText.isEmpty()) {
-                // Fallback si el parseo falla pero la respuesta fue 200 OK
                 System.out.println("DEBUG JSON: " + resp);
                 return "Error al leer el contenido JSON.";
             }
@@ -364,7 +354,7 @@ public class SmartLedger {
             return finalText.replace("\\n", "\n").replace("\\\"", "\"");
 
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error exacto en consola
+            e.printStackTrace(); 
             return "Error de conexión: " + e.getMessage();
         }
     }
