@@ -1,4 +1,4 @@
-// Archivo: Env.java
+
 
 import java.io.*;
 
@@ -9,7 +9,6 @@ public class Env {
     static {
         try {
             File f = new File(".env");
-            System.out.println("Intentando cargar: " + f.getAbsolutePath());
 
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line;
@@ -26,8 +25,7 @@ public class Env {
                     String key = parts[0].trim();
                     String value = parts[1].trim(); 
                     
-                    // --- ARREGLO CRÍTICO: Limpiar comillas ---
-                    // Si el valor está entre comillas (ej: value="clave"), las quitamos.
+                   
                     if (value.startsWith("\"") && value.endsWith("\"")) {
                         value = value.substring(1, value.length() - 1);
                     } else if (value.startsWith("'") && value.endsWith("'")) {

@@ -14,7 +14,7 @@ public class Usuario extends Persona{
     }
 
     public boolean verificarContraseña(String contraseña){
-        return  contraseña.equals(contraseña);
+        return  this.contraseña.equals(contraseña);
     }
 
 }
